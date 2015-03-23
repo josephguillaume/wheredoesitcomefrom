@@ -1,0 +1,50 @@
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+<script type="text/javascript" src="js/underscore.1.6.0.min.js"></script>
+<script type="text/javascript" src="js/backbone.1.1.2.min.js"></script>
+
+<script type="text/javascript" src="js/opencpu-0.5.js"></script>
+<script type="text/javascript" src="items.js"></script>
+
+<script type="text/template" id="SelectCountry_template">
+Item: <select>
+    <% _.each( countries, function( country ){ %>
+		<option value="<%- country%>"><%- country %></option>
+	<% }); %>
+</select>
+</script>
+
+<p id="choose_item" class="navbar-text navbar-right"></p>
+
+<div id="mydiv">
+</div>
+
+<script>
+var Product = Backbone.Model.extend({
+	defaults:{
+		item:"Soybeans"
+	},
+	initialize:function(args){}
+	});
+
+var SelectCountry = Backbone.View.extend({
+	initialize: function(args){
+		this.$el.html(_.template($("#SelectCountry_template").html(),{
+			countries:items
+		}));
+		var view=this;
+		this.$el.find("select").on('change',function(){view.model.set('item',view.$el.find("select").val())});
+		this.listenTo(this.model,'change:item',this.render,this);
+		this.render();
+	},
+	render:function(){
+		$("#mydiv").rplot( "mapImports",{item:this.model.get('item')})
+		this.$el.find("select").val(this.model.get('item'));
+	}
+});
+
+
+//ocpu.seturl("//localhost:3144/ocpu/library/wheredoesitcomefrom/R") //CORS
+var p=new Product();
+select_country = new SelectCountry({model:p,el:$("#choose_item")});
+</script>
